@@ -1,0 +1,16 @@
+{
+  "name": "minimax-web-server",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "server.socket.js",
+  "scripts": {
+    "start": "node server.socket.js"
+  },
+  "dependencies": {
+    "dotenv": "^17.2.3",
+    "express": "^5.1.0",
+    "multer": "^2.0.2",
+    "openai": "^6.9.1",
+    "socket.io": "^4.8.1"
+  }
+}

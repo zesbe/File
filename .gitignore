@@ -1,4 +1,37 @@
+# Dependencies
 node_modules/
 package-lock.json
+
+# Environment & Secrets
+.env
+.env.local
+*.pem
+*.key
+
+# Logs
 *.log
+npm-debug.log*
+
+# OS Files
 .DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Build outputs
+dist/
+build/
+*.class
+
+# Uploads & temp
+uploads/
+tmp/
+temp/
+
+# Android/iOS (React Native)
+android/app/build/
+android/.gradle/
+ios/Pods/
+ios/build/

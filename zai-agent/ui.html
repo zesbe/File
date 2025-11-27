@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Z.AI Streaming UI</title>
+  <style>
+    :root{
+      --bg:#071127; --card:#07243a; --accent:#19b29b; --text:#d7f6f3; --muted:#9fc0bf;
+    }
+    html,body{height:100%;margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Arial;color:var(--text);background:linear-gradient(180deg,#021020 0%, #032234 100%);}
+    .wrap{max-width:720px;margin:18px auto;padding:16px;}
+    header{font-size:28px;font-weight:700;margin-bottom:12px}
+    #chat{background:var(--card);border-radius:16px;padding:18px;height:64vh;overflow:auto;box-shadow:0 6px 30px rgba(0,0,0,.6)}
+    .bubble{margin-bottom:14px;max-width:95%;line-height:1.5;padding:12px 14px;border-radius:12px}
+    .you{background:rgba(255,255,255,0.04);align-self:flex-end;color:var(--muted)}
+    .assistant{background:linear-gradient(180deg, rgba(10,40,60,0.9), rgba(8,30,50,0.9));color:var(--text)}
+    .row{display:flex;gap:8px;margin-top:12px;align-items:center}
+    input[type="text"]{flex:1;padding:12px 14px;border-radius:10px;border:0;background:#fff;color:#222}
+    button{padding:10px 14px;border-radius:10px;border:0;background:var(--accent);color:#022;cursor:pointer;font-weight:600}
+    .meta{font-size:12px;color:var(--muted);margin-top:8px}
+    /* small */
+    @media(max-width:600px){
+      .wrap{padding:10px}
+      header{font-size:22px}
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>Z.AI Streaming Agent (Coding Plan)</header>
+    <div id="chat" aria-live="polite"></div>
+
+    <div class="row">
+      <input id="input" type="text" placeholder="Ketik pertanyaan / perintah coding" />
+      <button id="send">Kirim</button>
+    </div>
+    <div class="meta" id="status">status: idle</div>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const socket = io();
+    const chat = document.getElementById('chat');
+    const input = document.getElementById('input');
+    const sendBtn = document.getElementById('send');
+    const status = document.getElementById('status');
+
+    function appendBubble(text, cls='assistant') {
+      const el = document.createElement('div');
+      el.className = 'bubble ' + cls;
+      el.textContent = text;
+      chat.appendChild(el);
+      chat.scrollTop = chat.scrollHeight;
+      return el;
+    }
+
+    function createAssistantBubble() {
+      return appendBubble('', 'assistant');
+    }
+
+    sendBtn.addEventListener('click', () => {
+      const txt = input.value.trim();
+      if (!txt) return;
+      appendBubble('Kamu: ' + txt, 'you');
+      // create assistant placeholder for streaming
+      const assistantEl = createAssistantBubble();
+      // send prompt
+      socket.emit('prompt', { prompt: txt, model: 'glm-4.6' });
+      status.textContent = 'status: streaming...';
+      input.value = '';
+      input.focus();
+    });
+
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') sendBtn.click();
+    });
+
+    // token partials
+    socket.on('token', (t) => {
+      // append token to last assistant bubble
+      const assistants = chat.querySelectorAll('.assistant');
+      if (!assistants.length) {
+        appendBubble(String(t), 'assistant');
+      } else {
+        const last = assistants[assistants.length - 1];
+        last.textContent += String(t);
+      }
+      chat.scrollTop = chat.scrollHeight;
+    });
+
+    // done
+    socket.on('done', (payload) => {
+      // server sends '' (empty string) to signal done. If server sends non-empty final text, append it.
+      if (typeof payload === 'string' && payload.trim().length > 0) {
+        const assistants = chat.querySelectorAll('.assistant');
+        if (!assistants.length) appendBubble(payload, 'assistant');
+        else assistants[assistants.length-1].textContent += payload;
+      }
+      status.textContent = 'status: done';
+    });
+
+    socket.on('error', (e) => {
+      status.textContent = 'status: error';
+      appendBubble('Error: ' + String(e), 'assistant');
+    });
+
+    socket.on('connect', () => {
+      status.textContent = 'status: connected';
+    });
+
+    socket.on('disconnect', () => {
+      status.textContent = 'status: disconnected';
+    });
+  </script>
+</body>
+</html>
