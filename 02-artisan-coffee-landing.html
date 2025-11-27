@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Artisan Coffee Roasters</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Cormorant+Garamond:wght@300;400;500&family=Space+Mono&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --cream: #F4F1DE;
+      --espresso: #2C1810;
+      --terracotta: #C17C5E;
+      --sage: #A8B5A0;
+      --charcoal: #1A1A1A;
+      --gold: #C9A962;
+    }
+    
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    html { scroll-behavior: smooth; }
+    
+    body {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      background: var(--cream);
+      color: var(--espresso);
+      overflow-x: hidden;
+    }
+
+    /* Grain overlay */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%' height='100%' filter='url(%23noise)'/%3E%3C/svg%3E");
+      opacity: 0.03;
+      pointer-events: none;
+      z-index: 1000;
+    }
+
+    /* Navigation */
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      padding: 24px 60px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      mix-blend-mode: difference;
+    }
+    
+    .logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 18px;
+      font-weight: 600;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--cream);
+    }
+    
+    .nav-links {
+      display: flex;
+      gap: 40px;
+      list-style: none;
+    }
+    
+    .nav-links a {
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      text-decoration: none;
+      color: var(--cream);
+      transition: opacity 0.3s;
+    }
+    
+    .nav-links a:hover { opacity: 0.6; }
+
+    /* Hero Section */
+    .hero {
+      height: 100vh;
+      background: var(--espresso);
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      position: relative;
+    }
+    
+    .hero-left {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 0 80px;
+      position: relative;
+    }
+    
+    .hero-tag {
+      font-family: 'Space Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: var(--terracotta);
+      margin-bottom: 24px;
+    }
+    
+    .hero-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(48px, 8vw, 96px);
+      font-weight: 400;
+      line-height: 1;
+      color: var(--cream);
+      margin-bottom: 32px;
+    }
+    
+    .hero-title span {
+      display: block;
+      font-style: italic;
+      color: var(--terracotta);
+    }
+    
+    .hero-desc {
+      font-size: 18px;
+      font-weight: 300;
+      line-height: 1.8;
+      color: rgba(244, 241, 222, 0.7);
+      max-width: 400px;
+      margin-bottom: 48px;
+    }
+    
+    .hero-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 16px;
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--cream);
+      text-decoration: none;
+      padding: 20px 40px;
+      border: 1px solid var(--terracotta);
+      transition: all 0.4s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .hero-cta::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: var(--terracotta);
+      transition: left 0.4s ease;
+      z-index: -1;
+    }
+    
+    .hero-cta:hover::before { left: 0; }
+    .hero-cta:hover { color: var(--espresso); }
+    
+    .hero-right {
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .hero-image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      filter: sepia(20%) contrast(1.1);
+    }
+    
+    .hero-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, rgba(44, 24, 16, 0.3) 0%, transparent 60%);
+    }
+    
+    /* Diagonal divider */
+    .hero-right::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -50px;
+      width: 100px;
+      height: 100%;
+      background: var(--espresso);
+      transform: skewX(-3deg);
+      z-index: 10;
+    }
+    
+    .scroll-indicator {
+      position: absolute;
+      bottom: 40px;
+      left: 80px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    .scroll-indicator span {
+      font-family: 'Space Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 2px;
+      color: var(--terracotta);
+      writing-mode: vertical-rl;
+    }
+    
+    .scroll-line {
+      width: 1px;
+      height: 60px;
+      background: linear-gradient(to bottom, var(--terracotta), transparent);
+      animation: scrollPulse 2s ease-in-out infinite;
+    }
+    
+    @keyframes scrollPulse {
+      0%, 100% { transform: scaleY(1); opacity: 1; }
+      50% { transform: scaleY(0.5); opacity: 0.5; }
+    }
+
+    /* About Section */
+    .about {
+      padding: 160px 80px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 120px;
+      align-items: center;
+      background: var(--cream);
+      position: relative;
+    }
+    
+    .about::before {
+      content: '01';
+      position: absolute;
+      top: 80px;
+      right: 80px;
+      font-family: 'Playfair Display', serif;
+      font-size: 120px;
+      font-weight: 700;
+      color: rgba(44, 24, 16, 0.05);
+    }
+    
+    .about-image-container {
+      position: relative;
+      height: 600px;
+    }
+    
+    .about-image {
+      width: 80%;
+      height: 100%;
+      object-fit: cover;
+      filter: sepia(15%);
+    }
+    
+    .about-image-accent {
+      position: absolute;
+      bottom: -30px;
+      right: 0;
+      width: 60%;
+      height: 200px;
+      border: 1px solid var(--terracotta);
+    }
+    
+    .about-content {
+      padding-right: 40px;
+    }
+    
+    .section-tag {
+      font-family: 'Space Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: var(--terracotta);
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    
+    .section-tag::before {
+      content: '';
+      width: 40px;
+      height: 1px;
+      background: var(--terracotta);
+    }
+    
+    .section-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(36px, 5vw, 56px);
+      font-weight: 400;
+      line-height: 1.2;
+      margin-bottom: 32px;
+    }
+    
+    .section-title span {
+      font-style: italic;
+      color: var(--terracotta);
+    }
+    
+    .section-text {
+      font-size: 18px;
+      font-weight: 300;
+      line-height: 2;
+      color: rgba(44, 24, 16, 0.7);
+      margin-bottom: 40px;
+    }
+    
+    .stats {
+      display: flex;
+      gap: 60px;
+      padding-top: 40px;
+      border-top: 1px solid rgba(44, 24, 16, 0.1);
+    }
+    
+    .stat-number {
+      font-family: 'Playfair Display', serif;
+      font-size: 48px;
+      font-weight: 600;
+      color: var(--espresso);
+    }
+    
+    .stat-label {
+      font-family: 'Space Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--terracotta);
+      margin-top: 8px;
+    }
+
+    /* Products Section */
+    .products {
+      padding: 160px 80px;
+      background: var(--espresso);
+      position: relative;
+    }
+    
+    .products-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      margin-bottom: 80px;
+    }
+    
+    .products .section-tag { color: var(--gold); }
+    .products .section-tag::before { background: var(--gold); }
+    
+    .products .section-title {
+      color: var(--cream);
+      margin-bottom: 0;
+    }
+    
+    .view-all {
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--gold);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      transition: gap 0.3s;
+    }
+    
+    .view-all:hover { gap: 20px; }
+    
+    .products-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 40px;
+    }
+    
+    .product-card {
+      position: relative;
+      cursor: pointer;
+    }
+    
+    .product-image-wrap {
+      position: relative;
+      height: 400px;
+      overflow: hidden;
+      margin-bottom: 24px;
+    }
+    
+    .product-image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      filter: sepia(20%) brightness(0.9);
+      transition: transform 0.6s ease, filter 0.6s ease;
+    }
+    
+    .product-card:hover .product-image {
+      transform: scale(1.05);
+      filter: sepia(0%) brightness(1);
+    }
+    
+    .product-tag {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      font-family: 'Space Mono', monospace;
+      font-size: 9px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--cream);
+      background: var(--terracotta);
+      padding: 8px 16px;
+    }
+    
+    .product-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 24px;
+      color: var(--cream);
+      margin-bottom: 8px;
+    }
+    
+    .product-origin {
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--sage);
+      margin-bottom: 16px;
+    }
+    
+    .product-price {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 20px;
+      color: var(--gold);
+    }
+
+    /* Contact Section */
+    .contact {
+      padding: 160px 80px;
+      background: var(--sage);
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 120px;
+    }
+    
+    .contact-left {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    
+    .contact .section-tag { color: var(--espresso); }
+    .contact .section-tag::before { background: var(--espresso); }
+    
+    .contact .section-title { color: var(--espresso); }
+    
+    .contact-info {
+      margin-top: 60px;
+    }
+    
+    .contact-item {
+      margin-bottom: 32px;
+    }
+    
+    .contact-label {
+      font-family: 'Space Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--espresso);
+      opacity: 0.5;
+      margin-bottom: 8px;
+    }
+    
+    .contact-value {
+      font-family: 'Playfair Display', serif;
+      font-size: 20px;
+      color: var(--espresso);
+    }
+    
+    .contact-right {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .newsletter {
+      width: 100%;
+      max-width: 400px;
+    }
+    
+    .newsletter h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 28px;
+      font-weight: 400;
+      color: var(--espresso);
+      margin-bottom: 16px;
+    }
+    
+    .newsletter p {
+      font-size: 16px;
+      color: rgba(44, 24, 16, 0.7);
+      margin-bottom: 32px;
+      line-height: 1.8;
+    }
+    
+    .newsletter-form {
+      display: flex;
+      gap: 16px;
+    }
+    
+    .newsletter-form input {
+      flex: 1;
+      padding: 16px 24px;
+      border: 1px solid var(--espresso);
+      background: transparent;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 16px;
+      color: var(--espresso);
+    }
+    
+    .newsletter-form input::placeholder {
+      color: rgba(44, 24, 16, 0.5);
+    }
+    
+    .newsletter-form button {
+      padding: 16px 32px;
+      background: var(--espresso);
+      border: none;
+      font-family: 'Space Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--cream);
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    
+    .newsletter-form button:hover {
+      background: var(--terracotta);
+    }
+
+    /* Footer */
+    footer {
+      padding: 60px 80px;
+      background: var(--charcoal);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .footer-logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 16px;
+      font-weight: 600;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--cream);
+    }
+    
+    .footer-text {
+      font-family: 'Space Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 1px;
+      color: rgba(244, 241, 222, 0.5);
+    }
+    
+    .social-links {
+      display: flex;
+      gap: 24px;
+    }
+    
+    .social-links a {
+      font-family: 'Space Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--cream);
+      text-decoration: none;
+      opacity: 0.5;
+      transition: opacity 0.3s;
+    }
+    
+    .social-links a:hover { opacity: 1; }
+    
+    /* Placeholder images using gradients */
+    .hero-right {
+      background: linear-gradient(145deg, #3d2920 0%, #1a0f0a 100%);
+    }
+    
+    .about-image {
+      background: linear-gradient(145deg, #c9a962 0%, #8b7355 50%, #5a4a3a 100%);
+    }
+    
+    .product-image-wrap:nth-child(1) .product-image,
+    .product-card:nth-child(1) .product-image-wrap {
+      background: linear-gradient(180deg, #4a3728 0%, #2c1810 100%);
+    }
+    
+    .product-card:nth-child(2) .product-image-wrap {
+      background: linear-gradient(180deg, #5a4738 0%, #3c2720 100%);
+    }
+    
+    .product-card:nth-child(3) .product-image-wrap {
+      background: linear-gradient(180deg, #6a5748 0%, #4c3730 100%);
+    }
+
+    /* Responsive */
+    @media (max-width: 1024px) {
+      nav { padding: 20px 40px; }
+      .hero { grid-template-columns: 1fr; }
+      .hero-right { display: none; }
+      .hero-left { padding: 0 40px; }
+      .about { grid-template-columns: 1fr; padding: 80px 40px; }
+      .about-image-container { display: none; }
+      .products { padding: 80px 40px; }
+      .products-grid { grid-template-columns: 1fr; }
+      .contact { grid-template-columns: 1fr; padding: 80px 40px; gap: 60px; }
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <div class="logo">Artisan</div>
+    <ul class="nav-links">
+      <li><a href="#about">Story</a></li>
+      <li><a href="#products">Beans</a></li>
+      <li><a href="#contact">Visit</a></li>
+    </ul>
+  </nav>
+
+  <section class="hero">
+    <div class="hero-left">
+      <span class="hero-tag">Est. 2018 — Portland, Oregon</span>
+      <h1 class="hero-title">
+        Crafted
+        <span>with care</span>
+      </h1>
+      <p class="hero-desc">
+        We source the world's finest single-origin beans, roasted in small batches 
+        to bring out their unique character and complexity.
+      </p>
+      <a href="#products" class="hero-cta">
+        Explore Our Beans
+        <span>→</span>
+      </a>
+      <div class="scroll-indicator">
+        <span>Scroll</span>
+        <div class="scroll-line"></div>
+      </div>
+    </div>
+    <div class="hero-right">
+      <div class="hero-overlay"></div>
+    </div>
+  </section>
+
+  <section class="about" id="about">
+    <div class="about-image-container">
+      <div class="about-image"></div>
+      <div class="about-image-accent"></div>
+    </div>
+    <div class="about-content">
+      <span class="section-tag">Our Story</span>
+      <h2 class="section-title">
+        From farm to cup,<br>
+        <span>every step matters</span>
+      </h2>
+      <p class="section-text">
+        We work directly with farmers in Ethiopia, Colombia, and Guatemala, 
+        ensuring fair compensation and sustainable practices. Each batch is 
+        roasted by hand in our Portland roastery, where we obsess over every 
+        detail to deliver coffee that tells a story.
+      </p>
+      <div class="stats">
+        <div class="stat">
+          <div class="stat-number">12</div>
+          <div class="stat-label">Origin Countries</div>
+        </div>
+        <div class="stat">
+          <div class="stat-number">48h</div>
+          <div class="stat-label">Farm to Roast</div>
+        </div>
+        <div class="stat">
+          <div class="stat-number">100%</div>
+          <div class="stat-label">Traceable</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="products" id="products">
+    <div class="products-header">
+      <div>
+        <span class="section-tag">The Collection</span>
+        <h2 class="section-title">
+          Single Origin<br>
+          <span>Selections</span>
+        </h2>
+      </div>
+      <a href="#" class="view-all">View All Beans <span>→</span></a>
+    </div>
+    <div class="products-grid">
+      <div class="product-card">
+        <div class="product-image-wrap">
+          <div class="product-image"></div>
+          <span class="product-tag">Limited</span>
+        </div>
+        <h3 class="product-name">Yirgacheffe Reserve</h3>
+        <p class="product-origin">Ethiopia · Washed</p>
+        <span class="product-price">$24.00 / 250g</span>
+      </div>
+      <div class="product-card">
+        <div class="product-image-wrap">
+          <div class="product-image"></div>
+        </div>
+        <h3 class="product-name">Huila Supremo</h3>
+        <p class="product-origin">Colombia · Natural</p>
+        <span class="product-price">$22.00 / 250g</span>
+      </div>
+      <div class="product-card">
+        <div class="product-image-wrap">
+          <div class="product-image"></div>
+        </div>
+        <h3 class="product-name">Antigua Volcán</h3>
+        <p class="product-origin">Guatemala · Honey</p>
+        <span class="product-price">$21.00 / 250g</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="contact" id="contact">
+    <div class="contact-left">
+      <span class="section-tag">Get in Touch</span>
+      <h2 class="section-title">
+        Visit our<br>
+        <span>roastery</span>
+      </h2>
+      <div class="contact-info">
+        <div class="contact-item">
+          <div class="contact-label">Location</div>
+          <div class="contact-value">2847 SE Hawthorne Blvd, Portland OR</div>
+        </div>
+        <div class="contact-item">
+          <div class="contact-label">Hours</div>
+          <div class="contact-value">Mon—Sat: 7am — 6pm</div>
+        </div>
+        <div class="contact-item">
+          <div class="contact-label">Contact</div>
+          <div class="contact-value">hello@artisancoffee.com</div>
+        </div>
+      </div>
+    </div>
+    <div class="contact-right">
+      <div class="newsletter">
+        <h3>Stay in the loop</h3>
+        <p>Subscribe for early access to new roasts, brewing tips, and exclusive offers.</p>
+        <form class="newsletter-form">
+          <input type="email" placeholder="Your email">
+          <button type="submit">Join</button>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="footer-logo">Artisan Coffee Roasters</div>
+    <div class="footer-text">© 2024 All Rights Reserved</div>
+    <div class="social-links">
+      <a href="#">Instagram</a>
+      <a href="#">Twitter</a>
+      <a href="#">Pinterest</a>
+    </div>
+  </footer>
+</body>
+</html>
